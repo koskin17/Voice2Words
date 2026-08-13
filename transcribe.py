@@ -8,7 +8,7 @@ def transcribe_file(mp3_path, model_size = "small", chunk_ms = 60000, language =
     # 1. Convert and partition the audio file
     wav_path = "temp_output.wav"
     mp3_to_wav(mp3_path, wav_path)
-    chunks = split_wav(wav_path, chunk_lenght_ms = chunk_ms, out_dir = "chunks")
+    chunks = split_wav(wav_path, chunk_length_ms = chunk_ms, out_dir = "chunks")
     
     # 2. Load the Whisper model
     model = whisper.load_model(model_size)
