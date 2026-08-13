@@ -1,0 +1,4 @@
+pydub
+openai-whisper
+numpy
+scipy
