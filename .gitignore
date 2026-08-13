@@ -163,6 +163,9 @@ venv.bak/
 # MP3 files
 *.mp3
 
+# WAV files
+*.wav
+
 # Chunks files
 chunks/
 
