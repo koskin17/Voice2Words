@@ -32,7 +32,7 @@ if __name__ == "__main__":
     parser.add_argument("--chunk_ms", type = int, help = "Chunk lenght is ms", default = 60000)
     args = parser.parse_args()
     
-    wav = mp3_to_wav(args.inpput, args.wav)
+    wav = mp3_to_wav(args.input, args.wav)
     print("WAV saved:", wav)
     chunks = split_wav(wav, chunk_length_ms = args.chunk_ms)
     print("Chunks: ", chunks)
