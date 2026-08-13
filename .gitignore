@@ -163,6 +163,9 @@ venv.bak/
 # MP3 files
 *.mp3
 
+# Chunks files
+chunks/
+
 # Spyder project settings
 .spyderproject
 .spyproject
