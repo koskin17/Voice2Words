@@ -27,7 +27,7 @@ def split_wav(wav_path, chunk_lenght_ms = 60000, out_dir = "chunks"):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description = "Convert mp3 to wav and split into chunks")
-    parser.add_argument("inpot", help = "Input mp3 file")
+    parser.add_argument("input", help = "Input mp3 file")
     parser.add_argument("--wav", help = "Output wav file", default = "output.wav")
     parser.add_argument("--chunk_ms", type = int, help = "Chunk lenght is ms", default = 60000)
     args = parser.parse_args()
