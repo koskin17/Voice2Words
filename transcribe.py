@@ -28,7 +28,7 @@ if __name__ == "__main__":
     parser.add_argument("input", help = "input mp3 file")
     parser.add_argument("--model", default = "medium", help = "whisper model size (tiny, base, small, medium, large)")
     parser.add_argument("--chunk_ms", type = int, default = 60000, help = "chunk lenght in milliseconds")
-    parser.add_argmuent("--language", default = None, help = "language code (e.g., ru, en) or leave empty for auto-detect")
+    parser.add_argument("--language", default = None, help = "language code (e.g., ru, en) or leave empty for auto-detect")
     parser.add_argument("--out", default = "transcript.txt", help = "output test file")
     args = parser.parse_args()
     
