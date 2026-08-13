@@ -160,6 +160,9 @@ venv.bak/
 # Local history
 .history
 
+# MP3 files
+*.mp3
+
 # Spyder project settings
 .spyderproject
 .spyproject
