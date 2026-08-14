@@ -1,3 +1,6 @@
+from pydub import AudioSegment
+import os
+
 def mp3_to_wav(input_path, output_path, target_sr = 16000):
     audio = AudioSegment.from_file(input_path)
     audio = audio.set_frame_rate(target_sr).set_channels(1)
