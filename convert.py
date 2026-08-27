@@ -1,5 +1,7 @@
 from pydub import AudioSegment
+import argparse
 import os
+
 
 def mp3_to_wav(input_path, output_path, target_sr = 16000):
     audio = AudioSegment.from_file(input_path)
@@ -20,3 +22,18 @@ def split_wav(wav_path, chunk_length_ms = 60000, out_dir = "chunks"):
         chunks.append(chunk_name)
     
     return chunks
+    
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description = "Convert mp3 to wav and split into chunks")
+    parser.add_argument("input", help = "Input mp3 file")
+    parser.add_argument("--wav", help = "Output wav file", default = "output.wav")
+    parser.add_argument("--chunk_ms", type = int, help = "Chunk length in ms", default = 60000)
+    args = parser.parse_args()
+    
+    wav = mp3_to_wav(args.input, args.wav)
+    print("WAV saved:", wav)
+    chunks = split_wav(wav, chunk_length_ms = args.chunk_ms)
+    print("Chunks: ", chunks)
+    
