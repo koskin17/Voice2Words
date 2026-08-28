@@ -30,12 +30,29 @@ def mp3_to_wav(
     
     output_path.parent.mkdir(parents=True, exist_ok=True)
     
-    logging.info("Loading audio: %s", input_path)
+    logger.info("Loading audio: %s", input_path)
     
-    
-    audio = AudioSegment.from_file(input_path)
+    try:
+        audio = AudioSegment.from_file(input_path)
+    except Exception as e:
+        raise RuntimeError(
+            f"Failed to read audio file '{input_path}'."
+            f"Make sure the file is valid and FFmpeg is installed."
+        ) from e
+        
     audio = audio.set_frame_rate(target_sr).set_channels(1)
-    audio.export(output_path, format = "wav")
+    
+    logger.info("Converting audio to WAV: %s Hz mono", target_sr,)
+    
+    try:
+        audio.export(output_path, format = "wav")
+    except Exception as e:
+        raise RuntimeError(
+            f"Failed to export WAV file: {output_path}"
+        ) from e
+        
+    logger.info("WAV saved: %s", output_path)
+    
     return output_path
 
 def split_wav(wav_path, chunk_length_ms = 60000, out_dir = "chunks"):
