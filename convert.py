@@ -4,7 +4,7 @@ import logging
 from pydub import AudioSegment
 
 
-logger = logging.getLoger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def mp3_to_wav(
@@ -124,18 +124,50 @@ def split_wav(
     logger.info("Created %d audio chunks", len(chunk))
     
     return chunks
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Convert audio file to WAV and split it into chunks."
+    )
     
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description = "Convert mp3 to wav and split into chunks")
-    parser.add_argument("input", help = "Input mp3 file")
-    parser.add_argument("--wav", help = "Output wav file", default = "output.wav")
-    parser.add_argument("--chunk_ms", type = int, help = "Chunk length in ms", default = 60000)
+    parser.add_argument(
+        "input",
+        help = "Input audio file",
+    )
+    
+    parser.add_argument(
+        "--wav",
+        default = "output.wav",
+        help = "Output WAV file",
+    )
+    
+    parser.add_argument(
+        "--chunk_ms",
+        type = int,
+        default=60000,
+        help = "Chunk length in milliseconds",
+    )
+    
     args = parser.parse_args()
     
-    wav = mp3_to_wav(args.input, args.wav)
-    print("WAV saved:", wav)
-    chunks = split_wav(wav, chunk_length_ms = args.chunk_ms)
-    print("Chunks: ", chunks)
+    logging.basicConfig(
+        level = logging.INFO,
+        format = "%(levelname)s: %(message)s",
+    )
+    
+    try:
+        wav_path = mp3_to_wav(args.input, args.wav,)
+        print(f"WAV saved: {wav_path}")
+        chunks = split_wav(wav_path, chunk_length_ms = args.chunk_ms,)
+        print(f"Created {len(chunks)} chunks.")
+        
+        for chunk in chunks:
+            print(chunk)
+            
+    except (FileNotFoundError, ValueError, RuntimeError) as e:
+        logger.error("%s", e)
+        raise SystemExit(1)
+    
+if __name__ == "__main__":
+    main()
     
