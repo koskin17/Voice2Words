@@ -1,9 +1,38 @@
-from pydub import AudioSegment
+from pathlib import Path
 import argparse
-import os
+import logging
+from pydub import AudioSegment
 
 
-def mp3_to_wav(input_path, output_path, target_sr = 16000):
+logger = logging.getLoger(__name__)
+
+
+def mp3_to_wav(
+    input_path: str | Path,
+    output_path: str | Path,
+    target_sr: int = 16000,
+    ) -> Path:
+    """
+    Convert audio file to mono WAV with the specified sample rate.
+    """
+    
+    input_path = Path(input_path)
+    output_path = Path(output_path)
+    
+    if not input_path.exists():
+        raise FileNotFoundError(f"Input file not found: {input_path}")
+    
+    if not input_path.is_file():
+        raise ValueError(f"Input path is not a file: {input_path}")
+    
+    if target_sr <= 0:
+        raise ValueError("target_sr must be greater than 0")
+    
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    
+    logging.info("Loading audio: %s", input_path)
+    
+    
     audio = AudioSegment.from_file(input_path)
     audio = audio.set_frame_rate(target_sr).set_channels(1)
     audio.export(output_path, format = "wav")
