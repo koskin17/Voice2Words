@@ -55,17 +55,73 @@ def mp3_to_wav(
     
     return output_path
 
-def split_wav(wav_path, chunk_length_ms = 60000, out_dir = "chunks"):
-    os.makedirs(out_dir, exist_ok = True)
-    audio = AudioSegment.from_wav(wav_path)
-    duration_ms = len(audio)
-    chunks = []
+def split_wav(
+    wav_path: str | Path,
+    chunk_length_ms: int = 60000,
+    out_dir: str | Path = "chunks",
+    ) -> list[Path]:
+    """
+    Split WAV file into chunks of the specified length.
+    """
     
-    for i in range(0, duration_ms, chunk_length_ms):
-        chunk = audio[i: i + chunk_length_ms]
-        chunk_name = os.path.join(out_dir, f"chunk_{i//1000}_{(i + chunk_length_ms)//1000}.wav")
-        chunk.export(chunk_name, format = "wav")
-        chunks.append(chunk_name)
+    wav_path = Path(wav_path)
+    out_dir = Path(out_dir)
+    
+    if not wav_path.exist():
+        raise FileNotFoundError(f"WAV file not found: {wav_path}")
+    
+    if not wav_path.is_file():
+        raise FileNotFoundError(f"WAV path is not a file: {wav_path}")
+    
+    if chunk_length_ms <= 0:
+        raise ValueError("chunk_length_ms must be greater than 0")
+    
+    out_dir.mkdir(parents=True, exist_ok=True)
+    
+    logger.info("Loading WAV file: %s", wav_path)
+    
+    try:
+        audio = AudioSegment.from_wav(wav_path)
+    except Exception as e:
+        raise RuntimeError(
+            f"Failed to read WAV file: {wav_path}"
+        ) from e
+        
+    duration_ms = len(audio)
+    
+    if duration_ms == 0:
+        raise ValueError(f"WAV file is empty: {wav_path}")
+    
+    chunks: list[Path] = []
+    
+    chunk_number = 1
+    
+    for start_ms in range(0, duration_ms, chunk_length_ms):
+        end_ms = min(start_ms + chunk_length_ms, duration_ms)
+        
+        chunk = audio[start_ms:end_ms]
+        
+        chunk_name = out_dir / f"chunk_{chunk_number:04d}.wav"
+        
+        try:
+            chunk.export(chunk_name, format = "wav")
+        except Exception as e:
+            raise RuntimeError(
+                f"Failed to export chunk: {chunk_name}"
+            ) from e
+            
+        chunk.append(chunk_name)
+        
+        logger.debug(
+            "Created chunk %d: %d-%d ms",
+            chunk_number,
+            start_ms,
+            end_ms,
+        )
+    
+        chunk_number += 1
+        
+    logger.info("Created %d audio chunks", len(chunk))
     
     return chunks
     
