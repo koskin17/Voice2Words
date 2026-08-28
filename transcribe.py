@@ -1,10 +1,9 @@
 import whisper
-import os
 import argparse
 from convert import mp3_to_wav, split_wav
 
 
-def transcribe_file(mp3_path, model_size = "small", chunk_ms = 60000, language = None, output_txt = "transcribe.txt"):
+def transcribe_file(mp3_path, model_size = "medium", chunk_ms = 60000, language = None, output_txt = "transcribe.txt"):
     # 1. Convert and partition the audio file
     wav_path = "temp_output.wav"
     mp3_to_wav(mp3_path, wav_path)
