@@ -67,7 +67,7 @@ def split_wav(
     wav_path = Path(wav_path)
     out_dir = Path(out_dir)
     
-    if not wav_path.exist():
+    if not wav_path.exists():
         raise FileNotFoundError(f"WAV file not found: {wav_path}")
     
     if not wav_path.is_file():
@@ -110,7 +110,7 @@ def split_wav(
                 f"Failed to export chunk: {chunk_name}"
             ) from e
             
-        chunk.append(chunk_name)
+        chunks.append(chunk_name)
         
         logger.debug(
             "Created chunk %d: %d-%d ms",
@@ -121,7 +121,7 @@ def split_wav(
     
         chunk_number += 1
         
-    logger.info("Created %d audio chunks", len(chunk))
+    logger.info("Created %d audio chunks", len(chunks))
     
     return chunks
 
