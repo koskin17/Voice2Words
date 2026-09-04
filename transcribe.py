@@ -24,7 +24,7 @@ VALID_MODELS = {
 def transcribe_file(
     mp3_path: str | Path,
     model_size: str = DEFAULT_MODEL,
-    chunk_ms: int = 60000,
+    chunk_ms: int = DEFAULT_CHUNK_MS,
     language: str | None = None,
     output_txt: str | Path = "transcribe.txt",
     ) -> Path:
@@ -78,7 +78,7 @@ def transcribe_file(
         chunks = split_wav(wav_path, chunk_length_ms=chunk_ms, out_dir=chunks_dir)
 
         if not chunks:
-            raise RuntimeError("no audio chunks were created")
+            raise RuntimeError("No audio chunks were created")
 
         # 5. Load Whisper model
         logger.info("Loading Whisper model: %s", model_size)
@@ -92,13 +92,17 @@ def transcribe_file(
 
         with output_txt.open("w", encoding="utf-8") as output_file:
             for index, chunk in enumerate(chunks, start=1):
-                logger.info("Transcribing chunk %d/%d: %s", index, len(chunks), chunk.name)
+                chunk_message = f"Transcribing chunk {index} / {len(chunks)}"
+                logger.info(chunk_message)
+                
+                if progress_callback is not None:
+                    progress_callback(chunk_message)
 
                 try:
                     if language:
-                        result = model.transcribe(str(chunk), language=language)
+                        result = model.transcribe(str(chunk), language=language, fp16=False)
                     else:
-                        result = model.transcribe(str(chunk))
+                        result = model.transcribe(str(chunk), fp16=False)
                 except Exception as e:
                     logger.error("Failed to transcribe chunk %d/%d: %s", index, len(chunks), e)
                     raise RuntimeError(
@@ -111,8 +115,9 @@ def transcribe_file(
                     output_file.write(text + "\n")
 
                 output_file.flush()
-                progress = (index / len(chunks) * 100)
-                logger.info("Progress: %.1f%%", progress)
+
+                progress_percent = (index / len(chunks) * 100)
+                logger.info("Progress: %.1f%%", progress_percent)
 
             logger.info("Transcription saved to: %s", output_txt)
 
@@ -153,34 +158,3 @@ def main() -> None:
     
 if __name__ == "__main__":
     main()
-                
-                
-    # TODO: delete all below
-    # # 1. Convert and partition the audio file
-    # wav_path = "temp_output.wav"
-    # mp3_to_wav(mp3_path, wav_path)
-    # chunks = split_wav(wav_path, chunk_length_ms = chunk_ms, out_dir = "chunks")
-    
-    # # 2. Load the Whisper model
-    # model = whisper.load_model(model_size)
-    
-    # #3. Transcribe each chunk and save the results
-    # with open(output_txt, "w", encoding = "utf_8") as f:
-    #     for chunk in chunks:
-    #         print("Transcribing: ", chunk)
-    #         result = model.transcribe(chunk, language = language) if language else model.transcribe(chunk)
-    #         text = result.get("text", "").strip()
-    #         f.write(text + "\n")
-            
-    # print("Transcription save to: ", output_txt)
-
-# if __name__ == "__main__":
-#     parser = argparse.ArgumentParser()
-#     parser.add_argument("input", help = "input mp3 file")
-#     parser.add_argument("--model", default = "medium", help = "whisper model size (tiny, base, small, medium, large)")
-#     parser.add_argument("--chunk_ms", type = int, default = 60000, help = "chunk lenght in milliseconds")
-#     parser.add_argument("--language", default = None, help = "language code (e.g., ru, en) or leave empty for auto-detect")
-#     parser.add_argument("--out", default = "transcript.txt", help = "output test file")
-#     args = parser.parse_args()
-    
-#     transcribe_file(args.input, model_size = args.model, chunk_ms = args.chunk_ms, language = args.language, output_txt = args.out)
