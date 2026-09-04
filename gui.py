@@ -1,17 +1,28 @@
 import threading
 import tkinter as tk
 from tkinter import filedialog, messagebox
+
 from transcribe import transcribe_file
 
 
 def choose_file():
     file_path = filedialog.askopenfilename(
-        filetypes=[("MP3 files", "*.mp3"), ("WAV files", "*.wav"), ("All files", "*.*")]
-    )
+        filetypes=[("MP3 files", "*.mp3"), ("WAV files", "*.wav")])
     if file_path:
         entry_file.delete(0, tk.END)
         entry_file.insert(0, file_path)
-
+        
+def set_status(message: str):
+    status_var.set(message) #TODO: check error
+    
+def load_text_result(output_txt: str):
+    try:
+        with open(output_txt, "r", encoding="utf-8") as f:
+            text_box.delete("1.0", tk.END)
+            text_box.insert(tk.END, f.read())
+    except  Exception as e:
+        text_box.delete("1.0", th.END)
+        text_box.inxert(tk.END, f"Counld not liad result: {e}")
 
 def run_transcription():
     mp3_path = entry_file.get().strip()
@@ -28,24 +39,35 @@ def run_transcription():
         chunk_ms = int(chunk_seconds * 1000)
         language = entry_lang.get() or None
         output_txt = entry_out.get().strip() or "transcribe.txt"
-
-        transcribe_file(
-            mp3_path,
-            model_size=model_size,
-            chunk_ms=chunk_ms,
-            language=language,
-            output_txt=output_txt,
-        )
-
-        messagebox.showinfo("Done!", f"Transcription was saved in {output_txt}")
-
-        with open(output_txt, "r", encoding="utf-8") as f:
-            text_box.delete("1.0", tk.END)
-            text_box.insert(tk.END, f.read())
     except Exception as e:
-        messagebox.showerror("Error!", str(e))
-
-
+        messagebox.showerror("Error!", f"Invalid input: {e}")
+        return
+    
+    start_button.config(state="disabled")
+    set_status("Prepating transcription...")
+    
+    def worker():
+        try:
+            transcribe_file(mp3_path,
+                            model_size=model_size,
+                            chunk_ms=chunk_ms,
+                            language=language,
+                            output_txt=output_txt,
+                            progress_callback=lambda msg: root.after(0, lambda: set_status(msg)),
+            )
+            
+            root.after(0, lambda: set_status("Completed successfully"))
+            root.after(0, lambda: messagebox.showinfo("Done!", f"Transcription was saved in {output_txt}"))
+            root.after(0, lambda: load_text_result(output_txt))
+        except Exception as e:
+            root.after(0, lambda: set_status(f"Error: {e}"))
+            root.after(0, lambda: messagebox.showerror("Error!", str(e)))
+        finally:
+            root.after(0, lambda: start_button.config(state="normal"))
+            
+    thread = threading.Thread(target=worker, daemon=True)
+    thread.start()
+    
 root = tk.Tk()
 root.title("Voice2Words")
 
