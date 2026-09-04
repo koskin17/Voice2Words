@@ -1,6 +1,7 @@
 from pathlib import Path
 import argparse
 import logging
+
 from pydub import AudioSegment
 
 
@@ -112,12 +113,7 @@ def split_wav(
             
         chunks.append(chunk_name)
         
-        logger.debug(
-            "Created chunk %d: %d-%d ms",
-            chunk_number,
-            start_ms,
-            end_ms,
-        )
+        logger.debug("Created chunk %d: %d-%d ms", chunk_number, start_ms, end_ms)
     
         chunk_number += 1
         
@@ -126,34 +122,14 @@ def split_wav(
     return chunks
 
 def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Convert audio file to WAV and split it into chunks."
-    )
-    
-    parser.add_argument(
-        "input",
-        help = "Input audio file",
-    )
-    
-    parser.add_argument(
-        "--wav",
-        default = "output.wav",
-        help = "Output WAV file",
-    )
-    
-    parser.add_argument(
-        "--chunk_ms",
-        type = int,
-        default=60000,
-        help = "Chunk length in milliseconds",
-    )
+    parser = argparse.ArgumentParser(description="Convert audio file to WAV and split it into chunks.")
+    parser.add_argument("input", help = "Input audio file")
+    parser.add_argument("--wav", default = "output.wav", help = "Output WAV file")
+    parser.add_argument("--chunk_ms", type = int,default=60000, help = "Chunk length in milliseconds")
     
     args = parser.parse_args()
     
-    logging.basicConfig(
-        level = logging.INFO,
-        format = "%(levelname)s: %(message)s",
-    )
+    logging.basicConfig(level = logging.INFO, format = "%(levelname)s: %(message)s")
     
     try:
         wav_path = mp3_to_wav(args.input, args.wav,)
