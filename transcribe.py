@@ -27,6 +27,7 @@ def transcribe_file(
     chunk_ms: int = DEFAULT_CHUNK_MS,
     language: str | None = None,
     output_txt: str | Path = "transcribe.txt",
+    progress_callback=None,
     ) -> Path:
     """
     Convert audio file, split it into chunks, transcribe each chunk with Whisper and save the result to TXT.

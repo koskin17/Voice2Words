@@ -22,7 +22,7 @@ def load_text_result(output_txt: str):
             text_box.insert(tk.END, f.read())
     except  Exception as e:
         text_box.delete("1.0", tk.END)
-        text_box.inxert(tk.END, f"Counld not liad result: {e}")
+        text_box.insert(tk.END, f"Could not load result: {e}")
 
 def run_transcription():
     mp3_path = entry_file.get().strip()
@@ -44,7 +44,7 @@ def run_transcription():
         return
     
     start_button.config(state="disabled")
-    set_status("Prepating transcription...")
+    set_status("Preparing transcription...")
     
     def worker():
         try:
@@ -60,8 +60,9 @@ def run_transcription():
             root.after(0, lambda: messagebox.showinfo("Done!", f"Transcription was saved in {output_txt}"))
             root.after(0, lambda: load_text_result(output_txt))
         except Exception as e:
-            root.after(0, lambda: set_status(f"Error: {e}"))
-            root.after(0, lambda: messagebox.showerror("Error!", str(e)))
+            error_message = str(e)
+            root.after(0, lambda message=error_message: set_status(f"Error: {message}"))
+            root.after(0, lambda message=error_message: messagebox.showerror("Error!", message))
         finally:
             root.after(0, lambda: start_button.config(state="normal"))
             
@@ -101,10 +102,10 @@ entry_out.grid(row=4, column=1, sticky="w", padx=5, pady=5)
 
 # Status bar
 status_var = tk.StringVar(value="Ready")
-tk.Label(root, еучемфкшфиду=status_var, fg="darkgreen", anchor="w").grid(row=5, column=0, columnspan=3, sticky="ew", padx=5, pady=(5,0))
+tk.Label(root, textvariable=status_var, fg="darkgreen", anchor="w").grid(row=5, column=0, columnspan=3, sticky="ew", padx=5, pady=(5,0))
 
 # Start button
-start_button = tk.Button(root, text="Start", command=run_transcritpiton)
+start_button = tk.Button(root, text="Start", command=run_transcription)
 start_button.grid(row=6, column=0, columnspan=3, pady=10)
 
 # Field for text
