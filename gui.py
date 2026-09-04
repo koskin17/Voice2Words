@@ -13,7 +13,7 @@ def choose_file():
         entry_file.insert(0, file_path)
         
 def set_status(message: str):
-    status_var.set(message) #TODO: check error
+    status_var.set(message)
     
 def load_text_result(output_txt: str):
     try:
@@ -21,7 +21,7 @@ def load_text_result(output_txt: str):
             text_box.delete("1.0", tk.END)
             text_box.insert(tk.END, f.read())
     except  Exception as e:
-        text_box.delete("1.0", th.END)
+        text_box.delete("1.0", tk.END)
         text_box.inxert(tk.END, f"Counld not liad result: {e}")
 
 def run_transcription():
@@ -99,11 +99,16 @@ entry_out = tk.Entry(root)
 entry_out.insert(0, "transcribe.txt")
 entry_out.grid(row=4, column=1, sticky="w", padx=5, pady=5)
 
-# Button for start
-tk.Button(root, text="Start", command=run_transcription).grid(row=5, column=0, columnspan=3, pady=10)
+# Status bar
+status_var = tk.StringVar(value="Ready")
+tk.Label(root, еучемфкшфиду=status_var, fg="darkgreen", anchor="w").grid(row=5, column=0, columnspan=3, sticky="ew", padx=5, pady=(5,0))
+
+# Start button
+start_button = tk.Button(root, text="Start", command=run_transcritpiton)
+start_button.grid(row=6, column=0, columnspan=3, pady=10)
 
 # Field for text
 text_box = tk.Text(root, wrap="word", width=80, height=20)
-text_box.grid(row=6, column=0, columnspan=3, padx=10, pady=10)
+text_box.grid(row=7, column=0, columnspan=3, padx=10, pady=10)
 
 root.mainloop()
