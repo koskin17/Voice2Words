@@ -10,7 +10,7 @@ from convert import mp3_to_wav, split_wav
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_MODEL = "medium"
+DEFAULT_MODEL = "base"
 DEFAULT_CHUNK_MS = 60000
 
 VALID_MODELS = {
